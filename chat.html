@@ -151,60 +151,39 @@
     <div id="messages"></div>
 
 </div>
+
 <script>
-// 1. بالبداية نترك الاسم فارغ حتى ما تظهر النافذة أول ما يفتح الموقع
-let username = ""; 
+
+let username = prompt("Enter your username:");
 
 async function loadMessages(){
-    // إذا ماكو اسم مستخدم حالياً، نحاول نجيبه من حقل الإدخال "Your Name"
-    let nameInput = document.querySelector('input[name="username"]');
-    if (nameInput && nameInput.value) {
-        username = nameInput.value;
-    }
 
-    // إذا بعده الاسم فارغ، ما نحمل رسائل حتى ما يصير خطأ
     if(!username) return;
 
-    try {
-        let res = await fetch("/messages/" + username);
-        let data = await res.json();
+    let res = await fetch("/messages/" + username);
+    let data = await res.json();
 
-        let box = document.getElementById("messages");
-        box.innerHTML = "";
+    let box = document.getElementById("messages");
+    box.innerHTML = "";
 
-        // عرض الرسائل
-        data.messages.forEach(m => {
-            let div = document.createElement("div");
-            div.className = "msg " + (m.sender === username ? "me" : "other");
-            div.innerHTML =
-                "<div class='sender'>" + m.sender + "</div>" +
-                "<div>" + m.message + "</div>";
-            box.appendChild(div);
-        });
+    data.forEach(m => {
 
-        box.scrollTop = box.scrollHeight;
-    } catch (e) {
-        console.log("Error loading messages...");
-    }
+        let div = document.createElement("div");
+
+        div.className = "msg " + (m.sender === username ? "me" : "other");
+
+        div.innerHTML =
+            "<div class='sender'>" + m.sender + "</div>" +
+            "<div>" + m.message + "</div>";
+
+        box.appendChild(div);
+    });
+
+    box.scrollTop = box.scrollHeight;
 }
 
-// 2. دالة تطلب الاسم "بعدين" إذا المستخدم نسى يكتبه وضغط إرسال
-document.querySelector('form').onsubmit = function(e) {
-    let nameInput = document.querySelector('input[name="username"]');
-    if (!nameInput.value) {
-        e.preventDefault(); // نوقف الإرسال
-        let promptName = prompt("الرجاء إدخال اسمك أولاً لإرسال الرسالة:");
-        if (promptName) {
-            nameInput.value = promptName;
-            username = promptName;
-            // الآن نخليه يكمل إرسال
-            this.submit();
-        }
-    }
-};
-
-// تحديث الرسائل كل ثانيتين
 setInterval(loadMessages, 2000);
+
 </script>
 
 </body>
